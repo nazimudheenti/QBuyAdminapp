@@ -18,7 +18,7 @@ import Toast from 'react-native-toast-message';
 import store from './Redux/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Notification from './Components/Notification';
-// import messaging from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 import customAxios from './CustomeAxios';
 import axios from 'axios';
 import {setColors} from './config/COLORS';
@@ -56,7 +56,7 @@ const App = () => {
       }
     }
 
-    // notificationPermission();
+    notificationPermission();
 
     const subscription = AppState.addEventListener('change', onAppStateChange);
 

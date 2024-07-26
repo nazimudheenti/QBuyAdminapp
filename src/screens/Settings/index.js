@@ -13,6 +13,7 @@ import Toast from 'react-native-toast-message';
 import DeviceInfo from "react-native-device-info";
 // import reactotron from 'reactotron-react-native';
 import { COLORS } from '../../config/COLORS';
+import { queryClient } from '../../App'
 
 
 const Settings = ({ navigation }) => {
@@ -69,8 +70,12 @@ const Settings = ({ navigation }) => {
     }
 
     const handleLogout = async () => {
+        await customAxios.post('auth/update-devicetoken', {
+            token: ''
+        })
         await AsyncStorage.removeItem("token");
         authContext.setUserData({})
+        queryClient.removeQueries()
         navigation.replace('Login')
 
         handleModal();

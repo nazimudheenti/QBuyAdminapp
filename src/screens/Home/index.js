@@ -28,7 +28,7 @@ import AuthContext from '../../contexts/Auth';
 import SelectTab from '../../Components/SelectTab';
 import CommonDatePicker from '../../Components/CommonDatePicker';
 import moment from 'moment';
-import {useInfiniteQuery} from '@tanstack/react-query';
+import {useInfiniteQuery, useQuery} from '@tanstack/react-query';
 
 let isFirstCheck = true;
 const Home = ({navigation}) => {
@@ -53,34 +53,44 @@ const Home = ({navigation}) => {
 
   const {
     data,
-    error,
     fetchNextPage,
     refetch,
-    hasNextPage,
-    isFetching,
     isFetchingNextPage,
-    status,
     isLoading,
     remove: infiniteQueryRemove,
   } = useInfiniteQuery({
     queryKey: ['orderslist'],
-    enabled: true,
+    enabled: currentTab === 0,
     queryFn: ({pageParam = 1}) =>
-      customAxios.get(`admin/orderslist/panda?page=${pageParam}`),
-    onError(err) {
-      if (err === 'No products are available in your location') {
-        queryClient.setQueryData('offerproducts', {});
-      }
-    },
+      customAxios.get(`admin/order/mobile-list?page=${pageParam}`),
     getNextPageParam: (lastPage, pages) => {
       if (pages?.length > 0) {
         return pages?.length + 1;
       } else {
         return 1;
       }
-      //reactotron.log({lastPage, pages})
-      //if (lastPage.length === 0) return undefined;
-      //return pages?.length + 1
+    },
+  });
+
+
+  const {
+    data: historyData,
+    fetchNextPage: fetchHistoryNextPage,
+    refetch: historyRefetch,
+    isFetchingNextPage: historyIsFetchingNextPage,
+    isLoading: historyIsLoading,
+    // remove: infiniteQueryRemove,
+  } = useInfiniteQuery({
+    queryKey: ['completedlist'],
+    enabled: currentTab === 1,
+    queryFn: ({pageParam = 1}) =>
+      customAxios.get('admin/order/completed-list?page='+pageParam),
+    getNextPageParam: (lastPage, pages) => {
+      if (pages?.length > 0) {
+        return pages?.length + 1;
+      } else {
+        return 1;
+      }
     },
   });
 
@@ -88,44 +98,17 @@ const Home = ({navigation}) => {
   useEffect(() => {
     if (data) {
       setHomeData(data?.pages?.map(page => page?.data?.data?.data)?.flat());
-    }
+    } 
   }, [data]);
 
-  const getOrderHistory = async date => {
-    data = {
-      fromDate: date ? moment(date).format('YYYY-MM-DD') : null,
-      toDate: date ? moment(date).format('YYYY-MM-DD') : null,
-    };
-
-    setRefreshing(true);
-    try {
-      const response = await customAxios.post(`admin/orders_datefilter`, data);
-      if (response?.data?.status === 200 || 201) {
-        setOrderHistory(response.data.data);
-      }
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: error,
-      });
-    } finally {
-      setRefreshing(false);
+  useEffect(() => { 
+    if(historyData) {
+      setOrderHistory(historyData?.pages?.map(page => page?.data?.data?.data)?.flat())
     }
-  };
+  }, [historyData])
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (currentTab === 0) {
-        // getHomeDetails()
-      } else if (currentTab === 1) {
-        if (date) {
-          getOrderHistory(date);
-        } else {
-          getOrderHistory();
-        }
-      }
-    }, [currentTab, date]),
-  );
+
+
 
   const calendarOpen = useCallback(() => {
     setOpenCalendar(true);
@@ -170,18 +153,22 @@ const Home = ({navigation}) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await refetch();
+    if(currentTab === 0) {
+      await refetch();
+    } else {
+      await historyRefetch();
+    }
     setRefreshing(false);
     // getProfileDetails();
-  }, []);
+  }, [currentTab]);
 
   useEffect(() => { 
-    setRefreshing(isLoading)
-  }, [isLoading])
+    setRefreshing(isLoading || historyIsLoading)
+  }, [isLoading, historyIsLoading])
 
   const onRefreshHis = useCallback(() => {
     setRefreshing(true);
-    getOrderHistory(new Date());
+    // getOrderHistory(new Date());
     selectDate(new Date());
     // getProfileDetails();
   }, []);
@@ -189,7 +176,7 @@ const Home = ({navigation}) => {
   const ListFooterComponents = memo(() => {
     return (
       <View style={{marginBottom: 150}}>
-        {isFetchingNextPage && (
+        {(isFetchingNextPage || historyIsFetchingNextPage) && (
           <ActivityIndicator size="large" color={'green'} />
         )}
       </View>
@@ -197,8 +184,10 @@ const Home = ({navigation}) => {
   });
 
   const onEndReached = () => {
-    if (data?.pages?.length < data?.pages?.[0]?.data?.data?.last_page) {
+    if (data?.pages?.length < data?.pages?.[0]?.data?.data?.last_page && currentTab === 0) {
       fetchNextPage();
+    } else if (historyData?.pages?.length < historyData?.pages?.[0]?.data?.data?.last_page && currentTab === 1) {
+      fetchHistoryNextPage()
     }
   };
 
@@ -238,25 +227,25 @@ const Home = ({navigation}) => {
 
         <FlatList
           style={{backgroundColor: '#fff', paddingHorizontal: 15}}
-          ListHeaderComponent={
-            currentTab === 1 && (
-              <>
-                <CommonDatePicker
-                  onPress={calendarOpen}
-                  date={date ? date : new Date()}
-                  label={date ? moment(date).format('DD-MM-YYYY') : null}
-                  openCalendar={openCalendar}
-                  onConfirm={selectDate}
-                  onCancel={calendarClose}
-                  mt={5}
-                  clearAction={() => {
-                    selectDate(null);
-                  }}
-                />
-                <View style={{height: 30}} />
-              </>
-            )
-          }
+          // ListHeaderComponent={
+          //   currentTab === 1 && (
+          //     <>
+          //       <CommonDatePicker
+          //         onPress={calendarOpen}
+          //         date={date ? date : new Date()}
+          //         label={date ? moment(date).format('DD-MM-YYYY') : null}
+          //         openCalendar={openCalendar}
+          //         onConfirm={selectDate}
+          //         onCancel={calendarClose}
+          //         mt={5}
+          //         clearAction={() => {
+          //           selectDate(null);
+          //         }}
+          //       />
+          //       <View style={{height: 30}} />
+          //     </>
+          //   )
+          // }
           onEndReached={onEndReached}
           data={currentTab === 0 ? homeData : orderHistory}
           renderItem={renderItem}

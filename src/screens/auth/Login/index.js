@@ -15,7 +15,7 @@ import AuthContext from '../../../contexts/Auth';
 import LoaderContext from '../../../contexts/Loader';
 import customAxios from '../../../CustomeAxios';
 // import reactotron from '../../../ReactotronConfig';
-// import messaging from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '../../../config/COLORS';
 
@@ -114,14 +114,15 @@ const Login = ({ navigation }) => {
 		try {
 			const response = await customAxios.post("auth/login", data)
 			if (response?.data?.status === 200 || 201) {
-				// const firebaseToken = await messaging().getToken()
+				const firebaseToken = await messaging().getToken()
+
 
 				let token = response?.data?.access_token
 				await AsyncStorage.setItem("token", token);
 
-				// await customAxios.post('admin/updatetoken', {
-				// 	token: firebaseToken
-				// })
+				await customAxios.post('auth/update-devicetoken', {
+					token: firebaseToken
+				})
 
 				// userOtp.getProfileDetails()
 				navigation.replace('TabNavigator');

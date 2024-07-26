@@ -120,7 +120,11 @@ const CommonOrderCard = memo(props => {
   // console.log(typeof item?.itemDetails);
 
   const renderButton = ({status, paymentStatus, item}) => {
-    if (status === 'cancelled' || paymentStatus === 'cancelled') {
+    if (
+      status === 'cancelled' ||
+      paymentStatus === 'cancelled' ||
+      status === 'completed'
+    ) {
       return;
     }
 
@@ -149,7 +153,7 @@ const CommonOrderCard = memo(props => {
 
         <View
           style={{flexDirection: 'row', marginBottom: 15, alignSelf: 'center'}}>
-          {(status === 'created' && item?.order_type !== 'pickup') ? (
+          {status === 'created' && item?.order_type !== 'pickup' ? (
             <CustomButton
               onPress={() =>
                 openModal({
@@ -182,7 +186,8 @@ const CommonOrderCard = memo(props => {
                 mx={8}
               />
             </View>
-          ) : (status === 'ready' || (status === 'created' && item?.order_type === 'pickup')) ? (
+          ) : status === 'ready' ||
+            (status === 'created' && item?.order_type === 'pickup') ? (
             <View style={{flex: 1}}>
               <CustomButton
                 style={{flex: 1}}
@@ -429,7 +434,9 @@ const CommonOrderCard = memo(props => {
                   Pickup & Drop
                 </Text>
               </View>
-            ) : renderStatusLabel(item?.status)}
+            ) : (
+              renderStatusLabel(item?.status)
+            )}
           </View>
           <View style={{paddingLeft: 10, paddingVertical: 10, gap: 5}}>
             <View style={{flexDirection: 'row'}}>
@@ -438,7 +445,7 @@ const CommonOrderCard = memo(props => {
                   fontFamily: 'Poppins-Medium',
                   color: '#000',
                   fontSize: 13,
-                  flex: 3
+                  flex: 3,
                 }}>
                 Customer Details :{' '}
               </Text>
@@ -447,9 +454,11 @@ const CommonOrderCard = memo(props => {
                   fontFamily: 'Poppins-Bold',
                   color: '#000',
                   fontSize: 13,
-                  flex: 2
+                  flex: 2,
                 }}>
-                {item?.order_type === 'pickup' ? item.user?.name : item.customer_address?.name}
+                {item?.order_type === 'pickup'
+                  ? item?.name === 'null' || !item?.name ? '-' : item?.name
+                  : item.shipaddress?.name}
               </Text>
 
               <TouchableOpacity
@@ -457,7 +466,7 @@ const CommonOrderCard = memo(props => {
                   flex: 1,
                   justifyContent: 'center',
                   alignItems: 'center',
-                  paddingRight: 20
+                  paddingRight: 20,
                 }}
                 onPress={handleShow}>
                 {show ? (
@@ -491,7 +500,9 @@ const CommonOrderCard = memo(props => {
                   }}>
                   <Text style={styles.mainLabel}>{'Name : '}</Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
-                    {item?.order_type === 'pickup' ? item.user?.name : item.customer_address?.name}
+                    {item?.order_type === 'pickup'
+                      ? item?.name === 'null' || !item?.name ? '-' : item?.name
+                      : item.shipaddress?.name}
                   </Text>
                 </View>
 
@@ -502,7 +513,9 @@ const CommonOrderCard = memo(props => {
                   }}>
                   <Text style={styles.mainLabel}>{'Address : '}</Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
-                    {item?.order_type === 'pickup' ? item?.shipping_address : item?.customer_address?.area?.address}
+                    {item?.order_type === 'pickup'
+                      ? item?.shipping_address
+                      : item?.shipaddress?.area?.address}
                   </Text>
                 </View>
 
@@ -513,7 +526,9 @@ const CommonOrderCard = memo(props => {
                   }}>
                   <Text style={styles.mainLabel}>{'Mobile : '}</Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
-                    {item?.order_type === 'pickup' ? item?.mobile : item?.customer_address?.mobile}
+                    {item?.order_type === 'pickup'
+                      ? item?.mobile
+                      : item?.shipaddress?.mobile}
                   </Text>
                 </View>
 
@@ -552,15 +567,38 @@ const CommonOrderCard = memo(props => {
               <Text
                 style={{
                   fontFamily: 'Poppins-Bold',
-                  color: item?.paymentStatus === 'paid' ? '#1DB145' : '#E29D1B',
+                  color:
+                    item?.payment_status === 'completed' &&
+                    item?.payment_type === 'online'
+                      ? '#1DB145'
+                      : '#E29D1B',
                   fontSize: 13,
                 }}>
                 {item?.payment_status}
               </Text>
             </View>
+
+            <View style={{flexDirection: 'row'}}>
+              <Text
+                style={{
+                  fontFamily: 'Poppins-Medium',
+                  color: '#000',
+                  fontSize: 13,
+                }}>
+                Payment Status :{' '}
+              </Text>
+              <Text
+                style={{
+                  fontFamily: 'Poppins-Bold',
+                  color: '#E29D1B',
+                  fontSize: 13,
+                }}>
+                {item?.payment_type}
+              </Text>
+            </View>
           </View>
 
-          <TableHeading />
+          { Array.isArray(item?.product_details) && <TableHeading /> }
 
           {Array.isArray(item?.product_details) &&
             item?.product_details?.map((item, index) => (

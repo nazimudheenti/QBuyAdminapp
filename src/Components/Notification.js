@@ -1,12 +1,12 @@
 import notifee, { AndroidImportance, AndroidVisibility, EventType } from '@notifee/react-native';
-// import messaging from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 import { useContext, useEffect } from 'react';
 // import reactotron from 'reactotron-react-native';
 import AuthContext from '../contexts/Auth';
 import { navigationRef } from '../Navigations/RootNavigation';
 import DeviceInfo from 'react-native-device-info';
 import { PermissionsAndroid, Platform } from 'react-native';
-// import firebase from '@react-native-firebase/app';
+import firebase from '@react-native-firebase/app';
 
 
 
@@ -16,14 +16,14 @@ const Notification = () => {
 
 	useEffect(() => {
 		onAppBootstrap()
-		// messaging().onMessage(onMessageReceived);
-		//messaging().setBackgroundMessageHandler(onMessageReceived);
+		messaging().onMessage(onMessageReceived);
+		messaging().setBackgroundMessageHandler(onMessageReceived);
 	}, [])
 
 	useEffect(() => {
 		//getCurrentLocation()
-		// requestUserPermission()
-		//onAppBootstrap()
+		requestUserPermission()
+		onAppBootstrap()
 	}, [])
 
 
@@ -70,23 +70,18 @@ const Notification = () => {
 
 
 		await notifee.createChannel({
-			id: 'sounds',
+			id: 'orders',
 			name: 'Order Channel',
 			sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
 			importance: AndroidImportance.HIGH,
 			visibility: AndroidVisibility.PUBLIC
 		});
 
-		await notifee.createChannel({
-			id: 'default',
-			name: 'Default Channel',
-			sound: 'default',
-			importance: AndroidImportance.DEFAULT,
-			visibility: AndroidVisibility.PUBLIC
-		});
 	}
 
 	async function onMessageReceived(message) {
+
+		console.log(message?.notification);
 
 
 		notifee.displayNotification({
