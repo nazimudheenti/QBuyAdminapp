@@ -15,7 +15,7 @@ const CommonItems = memo(({ item }) => {
             </View>) : (<View style={{ flex: 0.5, }}>
                 <Text style={{ fontFamily: 'Poppins-Medium', fontSize: 10, color: '#23233C' }}>{item?.name} {item?.attributes?.[0] ? item?.attributes?.[0] : null}</Text>
             </View>)} */}
-            <Text style={{ fontFamily: 'Poppins-Medium', fontSize: 10, color: '#23233C', flex: 0.5 }}>{item?.name} {(item?.variants || item?.variant_id) ? `(${item?.attributes})` : null}</Text>
+            <Text style={{ fontFamily: 'Poppins-Medium', fontSize: 10, color: '#23233C', flex: 0.5 }}>{item?.name} {(item?.variants || item?.variant_id || item?.attributes) ? `(${item?.attributes})` : null}</Text>
             <View style={{ flex: 0.3, alignItems: "center" }}>
                 <Text style={{ fontFamily: 'Poppins-Medium', fontSize: 10, color: '#23233C', flex: 0.4 }}>{item?.quantity}</Text>
             </View>

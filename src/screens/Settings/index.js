@@ -70,9 +70,9 @@ const Settings = ({ navigation }) => {
     }
 
     const handleLogout = async () => {
-        await customAxios.post('auth/update-devicetoken', {
-            token: ''
-        })
+        // await customAxios.post('auth/update-devicetoken', {
+        //     token: ''
+        // })
         await AsyncStorage.removeItem("token");
         authContext.setUserData({})
         queryClient.removeQueries()

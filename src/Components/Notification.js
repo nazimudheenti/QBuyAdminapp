@@ -81,8 +81,6 @@ const Notification = () => {
 
 	async function onMessageReceived(message) {
 
-		console.log(message?.notification);
-
 
 		notifee.displayNotification({
 			id: message?.messageId,
