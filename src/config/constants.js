@@ -1,6 +1,6 @@
 
 
-export const env = "qbuy_live"
+export const env = "demo"
 
 const URLS = {
     dev: "https://digistoreapi.diginestsolutions.in/public/api/",

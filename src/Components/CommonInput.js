@@ -46,6 +46,9 @@ const CommonInput = ({ placeholder, control, fieldName, error, pressed, inputMod
                         <TextInput
                             onBlur={onBlur}
                             onChangeText={onChange}
+                            style={{
+                                flex: 1
+                            }}
                             value={value}
                             minHeight={height ? height : 45}
                             placeholder={placeholder}
