@@ -24,6 +24,7 @@ import customAxios from '../../CustomeAxios';
 import Toast from 'react-native-toast-message';
 import isEmpty from 'lodash/isEmpty';
 import has from 'lodash/has';
+import CommonStoreName from '../../Components/CommonStoreName'
 // import reactotron from 'reactotron-react-native';
 import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -585,7 +586,7 @@ const CommonOrderCard = memo(props => {
                   color: '#000',
                   fontSize: 13,
                 }}>
-                Payment Status :{' '}
+                Payment Type :{' '}
               </Text>
               <Text
                 style={{
@@ -597,6 +598,8 @@ const CommonOrderCard = memo(props => {
               </Text>
             </View>
           </View>
+
+ 
 
           { Array.isArray(item?.product_details) && <TableHeading /> }
 

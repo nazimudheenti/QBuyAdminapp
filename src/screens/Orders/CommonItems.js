@@ -7,8 +7,8 @@ const CommonItems = memo(({ item }) => {
 
     //reactotron.log(item, "ITEMINCARD")
 
-
     return (
+        <>
         <View style={{ flexDirection: 'row', borderColor: '#00000029', marginHorizontal: 10 }}>
             {/* {item?.unit?.name || item?.variant?.name ? (<View style={{ flex: 0.5 }}>
                 <Text style={{ fontFamily: 'Poppins-Medium', fontSize: 10, color: '#23233C' }}>{item?.name} ({item?.variants?.title} {item?.attributes?.name})</Text>
@@ -22,7 +22,14 @@ const CommonItems = memo(({ item }) => {
             <View style={{ flex: 0.2, alignItems: "flex-end" }}>
                 <Text style={{ fontFamily: 'Poppins-Medium', fontSize: 10, color: '#23233C' }}>₹ {Number(item?.price).toFixed(2)}</Text>
             </View>
+
         </View>
+
+        <View style={{ paddingHorizontal: 10, flexDirection: 'row', marginBottom: 10 }}>
+            <Text style={{ fontSize: 10, color: 'blue', fontWeight: '900' }}>Store </Text>
+            <Text style={{ fontSize: 10, color: '#23233C', fontWeight: '700' }}>: {item?.productdata?.store?.name}</Text>
+        </View>
+        </>
     )
 })
 
