@@ -46,56 +46,13 @@ const App = () => {
 
   useEffect(() => {
 
-    SplashScreen.hide()
-
-    async function notificationPermission() {
-      if (Platform.OS === 'ios') {
-        const authStatus = await messaging().requestPermission();
-        const enabled =
-          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-          authStatus === messaging.AuthorizationStatus.PROVISIONAL
-      } else {
-        PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-        ).then(async (si) => { 
-
-          console.log('yeesss', si);
-
-          if (env === 'qbuy_live') {
-            await notifee.createChannel({
-              id: 'orders',
-              name: 'Order Channel',
-              sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
-              importance: AndroidImportance.HIGH,
-              visibility: AndroidVisibility.PUBLIC,
-            });
-          } else if (env === 'demo') {
-            await notifee.createChannel({
-              id: 'orders_demo',
-              name: 'Demo Channel',
-              sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
-              importance: AndroidImportance.HIGH,
-              visibility: AndroidVisibility.PUBLIC,
-            });
-          } else if (env === 'qbuy') {
-            await notifee.createChannel({
-              id: 'orders_development',
-              name: 'Dev Channel',
-              sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
-              importance: AndroidImportance.HIGH,
-              visibility: AndroidVisibility.PUBLIC,
-            });
-          }
-         });
-      }
-    }
-
-    notificationPermission();
+    SplashScreen.hide()          
 
     const subscription = AppState.addEventListener('change', onAppStateChange);
 
     return () => subscription.remove();
   }, []);
+
 
   if (loading) {
     return <View />;

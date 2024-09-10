@@ -24,26 +24,52 @@ const Notification = () => {
 
   useEffect(() => {
     //getCurrentLocation()
-    requestUserPermission();
+    notificationPermission();
     onAppBootstrap();
   }, []);
 
-  async function requestUserPermission() {
-    if (Platform.OS === 'android') {
-      const status = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-      );
-    } else {
+
+  async function notificationPermission() {
+    if (Platform.OS === 'ios') {
       const authStatus = await messaging().requestPermission();
       const enabled =
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-      if (enabled) {
-        //console.log(‘Authorization status:’, authStatus);
-      }
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL
+    } else {
+
+      PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+      ).then(async (si) => { 
+
+        if (env === 'qbuy_live') {
+          await notifee.createChannel({
+            id: 'orders',
+            name: 'Order Channel',
+            sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
+            importance: AndroidImportance.HIGH,
+            visibility: AndroidVisibility.PUBLIC,
+          });
+        } else if (env === 'demo') {
+          await notifee.createChannel({
+            id: 'orders_demo',
+            name: 'Demo Channel',
+            sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
+            importance: AndroidImportance.HIGH,
+            visibility: AndroidVisibility.PUBLIC,
+          });
+        } else if (env === 'qbuy') {
+          await notifee.createChannel({
+            id: 'orders_dev',
+            name: 'Dev Channel',
+            sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
+            importance: AndroidImportance.HIGH,
+            visibility: AndroidVisibility.PUBLIC,
+          });
+        }
+       });
     }
-    //getCurrentLocation()
   }
+
 
   async function onAppBootstrap() {
     // Register the device with FCM
@@ -69,8 +95,14 @@ const Notification = () => {
     
   }
 
-  async function onMessageReceived(message) {
 
+  // notifee.getChannels().then
+
+  async function onMessageReceived(message) {   
+
+    console.log(message);
+    
+        
     notifee.displayNotification({
       id: message?.messageId,
       title: message?.notification?.title,
@@ -81,7 +113,6 @@ const Notification = () => {
         vibration: true,
         sound: 'order',
         smallIcon: 'ic_launcher', // optional, defaults to 'ic_launcher'.
-        // pressAction is needed if you want the notification to open the app when pressed
         pressAction: {
           id: 'default',
         },
