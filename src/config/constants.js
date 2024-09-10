@@ -1,6 +1,6 @@
 
 
-export const env = "qbuy_live"
+export const env = "qbuy"
 
 const URLS = {
     qbuy: 'https://apiqbuypanda.diginestsolutions.in/public/api/',

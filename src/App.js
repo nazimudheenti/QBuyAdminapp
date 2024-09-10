@@ -46,12 +46,13 @@ const App = () => {
 
   useEffect(() => {
 
-    SplashScreen.hide()
+    SplashScreen.hide()          
 
     const subscription = AppState.addEventListener('change', onAppStateChange);
 
     return () => subscription.remove();
   }, []);
+
 
   if (loading) {
     return <View />;

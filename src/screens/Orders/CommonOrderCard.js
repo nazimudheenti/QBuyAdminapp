@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   Modal,
+  Linking,
 } from 'react-native';
 import React, {useState, memo, useCallback, useContext, useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -30,6 +31,9 @@ import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CommonSelectDropdown from '../../Components/CommonSelectDropdown';
 import {COLORS} from '../../config/COLORS';
+import Entypo from 'react-native-vector-icons/Entypo';
+import Octicons from 'react-native-vector-icons/Octicons';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 const CommonOrderCard = memo(props => {
   const {item, onRefresh} = props;
@@ -44,6 +48,7 @@ const CommonOrderCard = memo(props => {
   const [cancelled, setCancelled] = useState(false); // dummy state for loading the page
   const loadingg = useContext(LoaderContext);
   const [showModal, setShowModal] = useState(false);
+  const [itemShow, setItemShow] = useState(false);
 
   const handleShowModal = useCallback(() => {
     setShowModal(!showModal);
@@ -56,8 +61,18 @@ const CommonOrderCard = memo(props => {
   };
 
   const handleShow = useCallback(() => {
+    if (itemShow) {
+      setItemShow(false);
+    }
     setShow(!show);
-  }, [show]);
+  }, [show, itemShow]);
+
+  const handleItemShow = useCallback(() => {
+    if (show) {
+      setShow(false);
+    }
+    setItemShow(!itemShow);
+  }, [itemShow, show]);
 
   // const returnOrder = async () => {
 
@@ -346,6 +361,12 @@ const CommonOrderCard = memo(props => {
     // }
   };
 
+  const originLatitude = 12.9715987; // Replace with desired origin latitude
+  const originLongitude = 77.5945627; // Replace with desired origin longitude
+
+  const destinationLatitude = item?.shipaddress?.area?.latitude;
+  const destinationLongitude = item?.shipaddress?.area?.longitude;
+
   const renderStatusLabel = status => {
     switch (status) {
       case 'ready':
@@ -399,6 +420,11 @@ const CommonOrderCard = memo(props => {
     }
   };
 
+  const openGpsCustomer = () => {
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${originLatitude},${originLongitude}&destination=${destinationLatitude},${destinationLongitude}`;
+    Linking.openURL(url);
+  };
+
   //reactotron.log(item, 'check details');
 
   // if(item?.status === 'completed') {
@@ -440,7 +466,8 @@ const CommonOrderCard = memo(props => {
             )}
           </View>
           <View style={{paddingLeft: 10, paddingVertical: 10, gap: 5}}>
-            <View style={{flexDirection: 'row'}}>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text
                 style={{
                   fontFamily: 'Poppins-Medium',
@@ -458,7 +485,9 @@ const CommonOrderCard = memo(props => {
                   flex: 2,
                 }}>
                 {item?.order_type === 'pickup'
-                  ? item?.name === 'null' || !item?.name ? '-' : item?.name
+                  ? item?.name === 'null' || !item?.name
+                    ? '-'
+                    : item?.name
                   : item.shipaddress?.name}
               </Text>
 
@@ -467,7 +496,6 @@ const CommonOrderCard = memo(props => {
                   flex: 1,
                   justifyContent: 'center',
                   alignItems: 'center',
-                  paddingRight: 20,
                 }}
                 onPress={handleShow}>
                 {show ? (
@@ -481,6 +509,48 @@ const CommonOrderCard = memo(props => {
                 )}
               </TouchableOpacity>
             </View>
+
+            {item?.order_type === 'pickup' && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                }}>
+                <Text
+                  style={{
+                    fontFamily: 'Poppins-Medium',
+                    color: '#000',
+                    fontSize: 13,
+                    flex: 3,
+                  }}>
+                  Item Details :{' '}
+                </Text>
+
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'flex-end',
+                    paddingRight: 15,
+                  }}
+                  onPress={handleItemShow}>
+                  {itemShow ? (
+                    <Ionicons
+                      name="chevron-up-circle"
+                      size={23}
+                      color={'blue'}
+                    />
+                  ) : (
+                    <Ionicons
+                      name="chevron-down-circle"
+                      size={23}
+                      color={'blue'}
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
 
             {show && (
               <View
@@ -502,7 +572,9 @@ const CommonOrderCard = memo(props => {
                   <Text style={styles.mainLabel}>{'Name : '}</Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
                     {item?.order_type === 'pickup'
-                      ? item?.name === 'null' || !item?.name ? '-' : item?.name
+                      ? item?.name === 'null' || !item?.name
+                        ? '-'
+                        : item?.name
                       : item.shipaddress?.name}
                   </Text>
                 </View>
@@ -538,11 +610,9 @@ const CommonOrderCard = memo(props => {
                     width: '100%',
                     flexDirection: 'row',
                   }}>
-                  <Text style={styles.mainLabel}>{'Delivery Date : '}</Text>
+                  <Text style={styles.mainLabel}>{'Delivery Date && Time : '}</Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
-                    {moment(item?.delivery_date, 'YYYY-MM-DD').format(
-                      'DD-MM-YYYY',
-                    )}
+                    {moment(item?.created_at).format('DD/MM/YYY HH:mm a')}
                   </Text>
                 </View>
 
@@ -553,6 +623,43 @@ const CommonOrderCard = memo(props => {
                                         <Text style={styles.mainLabel}>{'Delivery Slot : '}</Text>
                                         <Text style={[styles.dateText, { fontSize: 12, flex: 2 }]}>{item?.delivery_slot?.fromTime} ~ {item?.delivery_slot?.toTime}</Text>
                                     </View> */}
+              </View>
+            )}
+
+            {itemShow && (
+              <View
+                style={{
+                  width: '97%',
+                  marginHorizontal: 'auto',
+                  backgroundColor: '#F8F8F8',
+                  paddingHorizontal: 15,
+                  paddingVertical: 10,
+                  gap: 5,
+                  borderRadius: 12,
+                  marginBottom: 10,
+                }}>
+                <View
+                  style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                  }}>
+                  <Text style={styles.mainLabel}>{'Name : '}</Text>
+                  <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
+                    {item?.item_name || '-'}
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                    flex: 2
+                  }}>
+                  <Text style={styles.mainLabel}>{'Weight (Kg) : '}</Text>
+                  <Text style={[styles.dateText, {fontSize: 12, flex: 1}]}>
+                    {item?.weight || '-'}
+                  </Text>
+                </View>
               </View>
             )}
 
@@ -597,11 +704,81 @@ const CommonOrderCard = memo(props => {
                 {item?.payment_type}
               </Text>
             </View>
+
+            {item?.order_type === 'pickup' && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  backgroundColor: '#302023',
+                  padding: 10,
+                  borderRadius: 10,
+                  marginVertical: 10,
+                }}>
+                <View
+                  style={{
+                    flex: 0.2,
+                    justifyContent: 'center',
+                    gap: 10,
+                    alignItems: 'center',
+                  }}>
+                  <Octicons name="dot" size={23} color={'#fff'} />
+                  <Entypo name="dots-three-vertical" size={23} color={'#fff'} />
+                  <EvilIcons name="location" size={23} color={'#fff'} />
+                </View>
+                <View
+                  style={{
+                    flex: 0.8,
+                  }}>
+                  <View
+                    style={{
+                      borderBottomWidth: 1,
+                      borderBottomColor: '#edebe8',
+                      marginBottom: 6,
+                      paddingBottom: 6,
+                    }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Poppins-Bold',
+                        color: '#fff',
+                        fontSize: 10,
+                      }}>
+                      From
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: 'Poppins-Medium',
+                        color: '#edebe8',
+                        fontSize: 9,
+                      }}>
+                      {item?.pickup_location}
+                    </Text>
+                  </View>
+                  <View>
+                    <Text
+                      style={{
+                        fontFamily: 'Poppins-Bold',
+                        color: '#fff',
+                        fontSize: 10,
+                      }}>
+                      To
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: 'Poppins-Medium',
+                        color: '#edebe8',
+                        fontSize: 9,
+                      }}>
+                      {item?.drop_off_location}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            )}
           </View>
 
- 
-
-          { Array.isArray(item?.product_details) && <TableHeading /> }
+          {Array.isArray(item?.product_details) && <TableHeading />}
 
           {Array.isArray(item?.product_details) &&
             item?.product_details?.map((item, index) => (

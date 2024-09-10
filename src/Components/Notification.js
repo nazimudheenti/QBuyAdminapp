@@ -33,11 +33,12 @@ const Notification = () => {
       const authStatus = await messaging().requestPermission();
       const enabled =
         authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL
     } else {
+
       PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-      ).then(async si => {
+      ).then(async (si) => { 
 
         if (env === 'qbuy_live') {
           await notifee.createChannel({
@@ -64,9 +65,10 @@ const Notification = () => {
             visibility: AndroidVisibility.PUBLIC,
           });
         }
-      });
+       });
     }
   }
+
 
   async function onAppBootstrap() {
     // Register the device with FCM
@@ -91,10 +93,14 @@ const Notification = () => {
     await notifee.requestPermission();
   }
 
-  async function onMessageReceived(message) {
+
+  // notifee.getChannels().then
+
+  async function onMessageReceived(message) {   
+
     console.log(message);
     
-
+        
     notifee.displayNotification({
       id: message?.messageId,
       title: message?.notification?.title,
@@ -105,7 +111,6 @@ const Notification = () => {
         vibration: true,
         sound: 'order',
         smallIcon: 'ic_launcher', // optional, defaults to 'ic_launcher'.
-        // pressAction is needed if you want the notification to open the app when pressed
         pressAction: {
           id: 'default',
         },
