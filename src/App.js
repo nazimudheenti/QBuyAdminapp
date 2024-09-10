@@ -25,6 +25,11 @@ import {setColors} from './config/COLORS';
 import {focusManager} from '@tanstack/react-query';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import SplashScreen from 'react-native-splash-screen'
+import { env } from './config/constants';
+import notifee, {
+  AndroidImportance,
+  AndroidVisibility,
+} from '@notifee/react-native';
 
 
 export const queryClient = new QueryClient();
@@ -42,21 +47,6 @@ const App = () => {
   useEffect(() => {
 
     SplashScreen.hide()
-
-    async function notificationPermission() {
-      if (Platform.OS === 'ios') {
-        const authStatus = await messaging().requestPermission();
-        const enabled =
-          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-      } else {
-        PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-        );
-      }
-    }
-
-    notificationPermission();
 
     const subscription = AppState.addEventListener('change', onAppStateChange);
 
