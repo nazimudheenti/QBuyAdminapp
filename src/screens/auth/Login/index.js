@@ -18,6 +18,15 @@ import customAxios from '../../../CustomeAxios';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from '../../../config/COLORS';
+import DeviceInfo from 'react-native-device-info';
+import {PermissionsAndroid} from 'react-native';
+import firebase from '@react-native-firebase/app';
+import { env } from '../../../config/constants';
+import notifee, {
+	AndroidImportance,
+	AndroidVisibility,
+	EventType,
+  } from '@notifee/react-native';
 
 
 const Login = ({ navigation }) => {
@@ -41,6 +50,48 @@ const Login = ({ navigation }) => {
 	const { control, handleSubmit, formState: { errors }, setValue } = useForm({
 		resolver: yupResolver(schema)
 	});
+
+	async function notificationPermission() {
+		if (Platform.OS === 'ios') {
+		  const authStatus = await messaging().requestPermission();
+		  const enabled =
+			authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+			authStatus === messaging.AuthorizationStatus.PROVISIONAL
+		} else {
+	
+		  PermissionsAndroid.request(
+			PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+		  ).then(async (si) => { 
+	
+			if (env === 'qbuy_live') {
+			  await notifee.createChannel({
+				id: 'orders',
+				name: 'Order Channel',
+				sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
+				importance: AndroidImportance.HIGH,
+				visibility: AndroidVisibility.PUBLIC,
+			  });
+			} else if (env === 'demo') {
+			  await notifee.createChannel({
+				id: 'orders_demo',
+				name: 'Demo Channel',
+				sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
+				importance: AndroidImportance.HIGH,
+				visibility: AndroidVisibility.PUBLIC,
+			  });
+			} else if (env === 'qbuy') {
+			  await notifee.createChannel({
+				id: 'orders_dev',
+				name: 'Dev Channel',
+				sound: Platform.OS === 'ios' ? 'order.wav' : 'order',
+				importance: AndroidImportance.HIGH,
+				visibility: AndroidVisibility.PUBLIC,
+			  });
+			}
+		   });
+		}
+	  }
+	
 
 
 	// const onSubmit = async (data) => {
@@ -124,6 +175,7 @@ const Login = ({ navigation }) => {
 					token: firebaseToken
 				})
 
+				await notificationPermission();
 				// userOtp.getProfileDetails()
 				navigation.replace('TabNavigator');
 

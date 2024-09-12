@@ -14,6 +14,8 @@ import DeviceInfo from "react-native-device-info";
 // import reactotron from 'reactotron-react-native';
 import { COLORS } from '../../config/COLORS';
 import { queryClient } from '../../App'
+import notifee from '@notifee/react-native';
+import { env } from '../../config/constants';
 
 
 const Settings = ({ navigation }) => {
@@ -76,13 +78,18 @@ const Settings = ({ navigation }) => {
         await AsyncStorage.removeItem("token");
         authContext.setUserData({})
         queryClient.removeQueries()
-        navigation.replace('Login')
+        if (env === 'qbuy_live') {
+        notifee.deleteChannel(env === 'qbuy_live' ? 'orders' : env === 'demo' ? 'orders_demo' : 'orders_dev')
+        .then(() => {
+            navigation.replace('Login');
+            handleModal();
+            Toast.show({
+                type: 'success',
+                text1: response?.data?.message
+            });
+        })
+    }
 
-        handleModal();
-        Toast.show({
-            type: 'success',
-            text1: response?.data?.message
-        });
     }
 
     return (
