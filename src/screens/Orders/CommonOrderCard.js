@@ -231,7 +231,7 @@ const CommonOrderCard = memo(props => {
                       'Are you sure you want to change the status of the order to On the way?',
                     bgColor: '#3ac93f',
                     status: 4,
-                    statusName: 'ontheway',
+                    statusName: 'onTheWay',
                   })
                 }
                 label={'On the way'}
@@ -239,7 +239,7 @@ const CommonOrderCard = memo(props => {
                 mx={8}
               />
             </View>
-          ) : status === 'ontheway' ? (
+          ) : status === 'onTheWay' ? (
             <View style={{flex: 1}}>
               <CustomButton
                 style={{flex: 1}}
@@ -249,7 +249,7 @@ const CommonOrderCard = memo(props => {
                       'Are you sure you want to change the status of the order to On location?',
                     bgColor: '#3ac93f',
                     status: 4,
-                    statusName: 'onlocation',
+                    statusName: 'onLocation',
                   })
                 }
                 label={'On location'}
@@ -257,7 +257,7 @@ const CommonOrderCard = memo(props => {
                 mx={8}
               />
             </View>
-          ) : status === 'onlocation' ? (
+          ) : status === 'onLocation' ? (
             <View style={{flex: 1}}>
               <CustomButton
                 style={{flex: 1}}
@@ -612,7 +612,7 @@ const CommonOrderCard = memo(props => {
                   }}>
                   <Text style={styles.mainLabel}>{'Delivery Date && Time : '}</Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
-                    {moment(item?.created_at).format('DD/MM/YYY HH:mm a')}
+                    {moment(item?.created_at).format('DD/MM/YYYY HH:mm a')}
                   </Text>
                 </View>
 
@@ -655,8 +655,8 @@ const CommonOrderCard = memo(props => {
                     flexDirection: 'row',
                     flex: 2
                   }}>
-                  <Text style={styles.mainLabel}>{'Weight (Kg) : '}</Text>
-                  <Text style={[styles.dateText, {fontSize: 12, flex: 1}]}>
+                  <Text style={styles.mainLabel}>{'Weight : '}</Text>
+                  <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
                     {item?.weight || '-'}
                   </Text>
                 </View>
