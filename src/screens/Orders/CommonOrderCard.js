@@ -25,7 +25,7 @@ import customAxios from '../../CustomeAxios';
 import Toast from 'react-native-toast-message';
 import isEmpty from 'lodash/isEmpty';
 import has from 'lodash/has';
-import CommonStoreName from '../../Components/CommonStoreName'
+import CommonStoreName from '../../Components/CommonStoreName';
 // import reactotron from 'reactotron-react-native';
 import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -108,12 +108,25 @@ const CommonOrderCard = memo(props => {
     try {
       //let bundleId = DeviceInfo.getBundleId();
       //const type = bundleId.replace("com.qbuystoreapp.", "")
-      const response = await customAxios.post(`admin/order/status`, datas);
+
+      let response;
+      if (item?.order_type === 'pickup')
+        response = await customAxios.post(
+          `admin/pickup-drop/update`,
+          {
+            status: datas?.status,
+            payment_status: 'completed',
+            id: datas?.order_id,
+          },
+        );
+      else response = await customAxios.post(`admin/order/status`, datas);
+
       // if (response && has(response, "data.data") && !isEmpty(response.data.data)) {
       //     Toast.show({
       //         text1: response?.data?.message || "Order status changed successfully !!!"
       //     });
       // }
+      // payment_status :  "completed"
       if (response?.data?.status === 200 || 201) {
         Toast.show({
           text1:
@@ -610,7 +623,9 @@ const CommonOrderCard = memo(props => {
                     width: '100%',
                     flexDirection: 'row',
                   }}>
-                  <Text style={styles.mainLabel}>{'Delivery Date && Time : '}</Text>
+                  <Text style={styles.mainLabel}>
+                    {'Delivery Date && Time : '}
+                  </Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
                     {moment(item?.created_at).format('DD/MM/YYYY HH:mm a')}
                   </Text>
@@ -653,7 +668,7 @@ const CommonOrderCard = memo(props => {
                   style={{
                     width: '100%',
                     flexDirection: 'row',
-                    flex: 2
+                    flex: 2,
                   }}>
                   <Text style={styles.mainLabel}>{'Weight : '}</Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
