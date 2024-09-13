@@ -115,7 +115,7 @@ const CommonOrderCard = memo(props => {
           `admin/pickup-drop/update`,
           {
             status: datas?.status,
-            payment_status: 'completed',
+            payment_status: item?.payment_status,
             id: datas?.order_id,
           },
         );
@@ -182,7 +182,7 @@ const CommonOrderCard = memo(props => {
 
         <View
           style={{flexDirection: 'row', marginBottom: 15, alignSelf: 'center'}}>
-          {status === 'created' && item?.order_type !== 'pickup' ? (
+          {(status === 'created') && item?.order_type !== 'pickup' ? (
             <CustomButton
               onPress={() =>
                 openModal({
@@ -216,7 +216,7 @@ const CommonOrderCard = memo(props => {
               />
             </View>
           ) : status === 'ready' ||
-            (status === 'created' && item?.order_type === 'pickup') ? (
+            ((status === 'active' || status === 'created') && item?.order_type === 'pickup') ? (
             <View style={{flex: 1}}>
               <CustomButton
                 style={{flex: 1}}
