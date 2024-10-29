@@ -182,7 +182,7 @@ const CommonOrderCard = memo(props => {
 
         <View
           style={{flexDirection: 'row', marginBottom: 15, alignSelf: 'center'}}>
-          {(status === 'created') && item?.order_type !== 'pickup' ? (
+          {(status === 'active' || status === 'created') && item?.order_type !== 'pickup' ? (
             <CustomButton
               onPress={() =>
                 openModal({
@@ -501,7 +501,7 @@ const CommonOrderCard = memo(props => {
                   ? item?.name === 'null' || !item?.name
                     ? '-'
                     : item?.name
-                  : item.shipaddress?.name}
+                  : item?.shipaddress?.name}
               </Text>
 
               <TouchableOpacity
@@ -624,10 +624,10 @@ const CommonOrderCard = memo(props => {
                     flexDirection: 'row',
                   }}>
                   <Text style={styles.mainLabel}>
-                    {'Delivery Date && Time : '}
+                    {item?.order_type === 'pickup' ? 'Pickup Date && Time': 'Delivery Date && Time : '}
                   </Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
-                    {moment(item?.created_at).format('DD/MM/YYYY HH:mm a')}
+                    {item?.order_type === 'pickup' ? `${item?.pickup_date + ' ' + moment(item?.pickup_time, "HH:mm").format("h:mm A")}` : moment(item?.created_at).format('DD/MM/YYYY HH:mm A')}
                   </Text>
                 </View>
 

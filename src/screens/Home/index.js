@@ -97,7 +97,7 @@ const Home = ({navigation}) => {
 
   useEffect(() => {
     if (data) {
-      setHomeData(data?.pages?.map(page => page?.data?.data?.data)?.flat());
+      setHomeData(data?.pages?.map(page => page?.data?.dataa?.data)?.flat());
     } 
   }, [data]);
 
@@ -184,9 +184,11 @@ const Home = ({navigation}) => {
   });
 
   const onEndReached = () => {
-    if (data?.pages?.length < data?.pages?.[0]?.data?.data?.last_page && currentTab === 0) {
+    if (data?.pages?.length < data?.pages?.[0]?.data?.dataa?.last_page && currentTab === 0) {
       fetchNextPage();
     } else if (historyData?.pages?.length < historyData?.pages?.[0]?.data?.data?.last_page && currentTab === 1) {
+      console.log('helll');
+
       fetchHistoryNextPage()
     }
   };

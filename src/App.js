@@ -30,6 +30,7 @@ import notifee, {
   AndroidImportance,
   AndroidVisibility,
 } from '@notifee/react-native';
+import { navigationRef } from './Navigations/RootNavigation';
 
 
 export const queryClient = new QueryClient();
@@ -37,20 +38,11 @@ export const queryClient = new QueryClient();
 const App = () => {
   const [loading, setLoading] = useState(false);
 
-  function onAppStateChange(status) {
-    if (Platform.OS !== 'web') {
-      focusManager.setFocused(status === 'active');
-    }
-  }
+
 
 
   useEffect(() => {
-
     SplashScreen.hide()          
-
-    const subscription = AppState.addEventListener('change', onAppStateChange);
-
-    return () => subscription.remove();
   }, []);
 
 
