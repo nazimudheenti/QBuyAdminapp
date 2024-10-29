@@ -97,6 +97,8 @@ const CommonOrderCard = memo(props => {
     setModalVisible({visible: false});
   }, []);
 
+  
+
   const onSubmit = async datas => {
     datas = {
       order_id: item?._id,
@@ -182,7 +184,7 @@ const CommonOrderCard = memo(props => {
 
         <View
           style={{flexDirection: 'row', marginBottom: 15, alignSelf: 'center'}}>
-          {(status === 'active' || status === 'created') && item?.order_type !== 'pickup' ? (
+          {(status === 'active' && !item?.rider_each_order_settlement?.rider_status || status === 'created' && !item?.rider_each_order_settlement?.rider_status) && item?.order_type !== 'pickup' ? (
             <CustomButton
               onPress={() =>
                 openModal({
@@ -215,7 +217,7 @@ const CommonOrderCard = memo(props => {
                 mx={8}
               />
             </View>
-          ) : status === 'ready' ||
+          ) : (status === 'ready') || (status === 'active' && item?.rider_each_order_settlement?.rider_status === 'active') ||
             ((status === 'active' || status === 'created') && item?.order_type === 'pickup') ? (
             <View style={{flex: 1}}>
               <CustomButton
