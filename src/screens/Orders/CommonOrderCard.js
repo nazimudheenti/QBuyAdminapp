@@ -97,8 +97,6 @@ const CommonOrderCard = memo(props => {
     setModalVisible({visible: false});
   }, []);
 
-  
-
   const onSubmit = async datas => {
     datas = {
       order_id: item?._id,
@@ -113,14 +111,11 @@ const CommonOrderCard = memo(props => {
 
       let response;
       if (item?.order_type === 'pickup')
-        response = await customAxios.post(
-          `admin/pickup-drop/update`,
-          {
-            status: datas?.status,
-            payment_status: item?.payment_status,
-            id: datas?.order_id,
-          },
-        );
+        response = await customAxios.post(`admin/pickup-drop/update`, {
+          status: datas?.status,
+          payment_status: item?.payment_status,
+          id: datas?.order_id,
+        });
       else response = await customAxios.post(`admin/order/status`, datas);
 
       // if (response && has(response, "data.data") && !isEmpty(response.data.data)) {
@@ -184,7 +179,11 @@ const CommonOrderCard = memo(props => {
 
         <View
           style={{flexDirection: 'row', marginBottom: 15, alignSelf: 'center'}}>
-          {(status === 'active' && !item?.rider_each_order_settlement?.rider_status || status === 'created' && !item?.rider_each_order_settlement?.rider_status) && item?.order_type !== 'pickup' ? (
+          {((status === 'active' &&
+            !item?.rider_each_order_settlement?.rider_status) ||
+            (status === 'created' &&
+              !item?.rider_each_order_settlement?.rider_status)) &&
+          item?.order_type !== 'pickup' ? (
             <CustomButton
               onPress={() =>
                 openModal({
@@ -217,8 +216,11 @@ const CommonOrderCard = memo(props => {
                 mx={8}
               />
             </View>
-          ) : (status === 'ready') || (status === 'active' && item?.rider_each_order_settlement?.rider_status === 'active') ||
-            ((status === 'active' || status === 'created') && item?.order_type === 'pickup') ? (
+          ) : status === 'ready' ||
+            (status === 'active' &&
+              item?.rider_each_order_settlement?.rider_status === 'active') ||
+            ((status === 'active' || status === 'created') &&
+              item?.order_type === 'pickup') || (status === 'created' && (item?.rider_each_order_settlement?.rider_status === 'new' || item?.rider_each_order_settlement?.rider_status === 'active'))  ? (
             <View style={{flex: 1}}>
               <CustomButton
                 style={{flex: 1}}
@@ -626,10 +628,14 @@ const CommonOrderCard = memo(props => {
                     flexDirection: 'row',
                   }}>
                   <Text style={styles.mainLabel}>
-                    {item?.order_type === 'pickup' ? 'Pickup Date && Time': 'Delivery Date && Time : '}
+                    {item?.order_type === 'pickup'
+                      ? 'Pickup Date && Time'
+                      : 'Delivery Date && Time : '}
                   </Text>
                   <Text style={[styles.dateText, {fontSize: 12, flex: 2}]}>
-                    {item?.order_type === 'pickup' ? `${item?.pickup_date + ' ' + moment(item?.pickup_time, "HH:mm").format("h:mm A")}` : moment(item?.created_at).format('DD/MM/YYYY HH:mm A')}
+                    {item?.order_type === 'pickup'
+                      ? `${item?.pickup_date + ' ' + moment(item?.pickup_time, 'HH:mm').format('h:mm A')}`
+                      : moment(item?.created_at).format('DD/MM/YYYY HH:mm A')}
                   </Text>
                 </View>
 
